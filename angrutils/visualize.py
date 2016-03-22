@@ -4,7 +4,7 @@ from pydot import Dot
 from pydot import Edge
 from pydot import Node
 from pydot import Subgraph
-
+import networkx
 from collections import defaultdict
 
 default_node_attributes = {
@@ -21,6 +21,9 @@ default_edge_attributes = {
 EDGECOLOR_CONDITIONAL_TRUE  = 'green'
 EDGECOLOR_CONDITIONAL_FALSE = 'red'
 EDGECOLOR_UNCONDITIONAL     = 'blue'
+EDGECOLOR_CALL              = 'black'
+EDGECOLOR_RET               = 'grey'
+EDGECOLOR_UNKNOWN           = 'yellow'
 
 LEFT_ALIGN = '\\l'
 
@@ -73,7 +76,6 @@ def node_debug_info(node):
     #node.input_state
     return ret
 
-    
 def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, debug_info=False):
     
     dot_graph = Dot(graph_type="digraph", rankdir="TB")
@@ -83,35 +85,37 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
     nmap = {}
     nidx = 0
     
-    ccfg = cfg.copy()
-                
+    ccfg_graph = networkx.DiGraph(cfg.graph)
+
     if func_addr != None:
-        for node in ccfg.graph.nodes():
+        for node in ccfg_graph.nodes():
             if node.function_address not in func_addr:
-                ccfg.graph.remove_node(node)
+                ccfg_graph.remove_node(node)
 
     else:
         if remove_imports:
-            eaddrs = import_addrs(ccfg.project)
-            for node in ccfg.graph.nodes():
+            eaddrs = import_addrs(cfg.project)
+            for node in ccfg_graph.nodes():
+                if node == None: 
+                    continue
                 if node.addr in eaddrs:
                     try:
-                        ccfg.graph.remove_node(node)
+                        ccfg_graph.remove_node(node)
                     except:
                         pass
                     for pnode in node.predecessors:
                         try:
-                            ccfg.graph.remove_node(pnode)
+                            ccfg_graph.remove_node(pnode)
                         except:
                             pass
         
         if remove_path_terminator:
-            for node in ccfg.graph.nodes():
-                if node.is_simprocedure and node.simprocedure_name == "PathTerminator":
-                    ccfg.graph.remove_node(node)
+            for node in ccfg_graph.nodes():
+                if hasattr(node, 'is_simprocedure') and  hasattr(node, 'simprocedure_name') and node.is_simprocedure and node.simprocedure_name == "PathTerminator":
+                    ccfg_graph.remove_node(node)
 
-    for node in sorted(ccfg.graph.nodes(), key=lambda _: _.addr):
-        blocks[node.addr] = ccfg.project.factory.block(addr=node.addr)
+    for node in sorted(filter(lambda _: _ != None,ccfg_graph.nodes()), key=lambda _: _.addr):
+        blocks[node.addr] = cfg.project.factory.block(addr=node.addr)
     
         attributes=[]
         if node.is_simprocedure:
@@ -150,18 +154,30 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
     #            dot_graph.add_edge(Edge(nodes[nmap[nn[0]]],nodes[nmap[n]],style="invis"))
 
     edgeprop = {}    
-    for source,target in ccfg.graph.edges():
+    for source,target in ccfg_graph.edges():
+        if source == None or target == None:
+            continue
         key = (nmap[source], nmap[target])
 
+        edge_style='solid'
         if not key in edgeprop:
-            if len(blocks[source.addr].vex.constant_jump_targets) > 1:
-                if target.addr == blocks[source.addr].vex.next.constants[0].value:
-                    color=EDGECOLOR_CONDITIONAL_FALSE
+            if blocks[source.addr].vex.jumpkind == 'Ijk_Boring':
+                if len(blocks[source.addr].vex.constant_jump_targets) > 1:
+                    if target.addr == blocks[source.addr].vex.next.constants[0].value:
+                        color=EDGECOLOR_CONDITIONAL_FALSE
+                    else:
+                        color=EDGECOLOR_CONDITIONAL_TRUE
                 else:
-                    color=EDGECOLOR_CONDITIONAL_TRUE
+                    color=EDGECOLOR_UNCONDITIONAL
+            elif blocks[source.addr].vex.jumpkind == 'Ijk_Call':
+                color=EDGECOLOR_CALL
+                if blocks[source.addr].vex.next.constants[0].value != target.addr:
+                    edge_style='dotted'
+            elif blocks[source.addr].vex.jumpkind == 'Ijk_Ret':
+                color=EDGECOLOR_RET
             else:
-                color=EDGECOLOR_UNCONDITIONAL
-
+                color=EDGECOLOR_UNKNOWN
+            
             penwidth=1
             
             edgeprop[key]= {
@@ -169,7 +185,7 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
                 "penwidth": penwidth,
             }
         
-        dot_graph.add_edge(Edge(nodes[nmap[source]],nodes[nmap[target]],color=edgeprop[key]["color"], penwidth=edgeprop[key]["penwidth"], **default_edge_attributes))
+        dot_graph.add_edge(Edge(nodes[nmap[source]],nodes[nmap[target]],color=edgeprop[key]["color"], style=edge_style, penwidth=edgeprop[key]["penwidth"], **default_edge_attributes))
     
     dot_graph.write("{}.{}".format(fname, format), format=format)
 

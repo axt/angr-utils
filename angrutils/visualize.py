@@ -185,9 +185,9 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
             label += "| " + node_debug_info(node)
         label += "}}"
 
-        penwidth = 1
+        penwidth = '1'
         if node in active_nodes:
-            penwidth = 3
+            penwidth = '3'
 
         if not node.is_simprocedure:
             nodes[nmap[node]] = Node(nmap[node], label=label, penwidth=penwidth, **default_node_attributes)
@@ -227,9 +227,9 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
             else:
                 color=EDGECOLOR_UNKNOWN
     
-            penwidth=1
+            penwidth='1'
             if source in active_edges and target in active_edges[source]:
-                penwidth=3
+                penwidth='3'
             
             edgeprop[key]= {
                 "color" : color,

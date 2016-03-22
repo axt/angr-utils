@@ -6,6 +6,7 @@ setup(
     packages=['angrutils'],
     install_requires=[
         'pydot',
+	'networkx'
     ],
     description='Various utilities for angr binary analysis framework',
     url='https://github.com/axt/angr-utils',

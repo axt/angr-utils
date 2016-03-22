@@ -5,6 +5,8 @@ from pydot import Edge
 from pydot import Node
 from pydot import Subgraph
 
+import networkx
+
 from collections import defaultdict
 
 # NOTE: the code is a bit fuzzy, will be refactored in later releases

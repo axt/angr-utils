@@ -2,6 +2,9 @@
 
 Angr-utils is a collection of utilities for angr binary analysis framework.
 
+## Functionality
+* Create fancy CFG-s
+* Thats all for now :)
 
 ## Usage
 

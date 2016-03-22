@@ -4,8 +4,14 @@ from pydot import Dot
 from pydot import Edge
 from pydot import Node
 from pydot import Subgraph
-import networkx
+
 from collections import defaultdict
+
+# NOTE: the code is a bit fuzzy, will be refactored in later releases
+# TODO: add user-supplied edge labels
+#       add user-supplied node info
+#       it seems one edge is missing from angr cfg for the 'plot_cfg_graph' example, needs to be investigated
+#       support VFG plots
 
 default_node_attributes = {
     'shape'    : 'Mrecord',
@@ -76,22 +82,35 @@ def node_debug_info(node):
     #node.input_state
     return ret
 
-def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, debug_info=False):
+def node_matches(node, trace):
+    cs = list(filter(lambda _: _ !=None, node.callstack_key))   
+    current = cs.pop()
+    tpos = len(trace)-1
+    while tpos > 0:
+        if trace[tpos] == current:
+            if len(cs) > 0:
+                current = cs.pop()
+            else:
+                break
+        tpos -= 1
+    return len(cs) == 0
+    
+def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, debug_info=False):
     
     dot_graph = Dot(graph_type="digraph", rankdir="TB")
-    
+        
     nodes = {}
     blocks = {}
     nmap = {}
     nidx = 0
     
     ccfg_graph = networkx.DiGraph(cfg.graph)
-
+    filtered_addr = set()
     if func_addr != None:
         for node in ccfg_graph.nodes():
             if node.function_address not in func_addr:
                 ccfg_graph.remove_node(node)
-
+                filtered_addr.add(node.addr)
     else:
         if remove_imports:
             eaddrs = import_addrs(cfg.project)
@@ -101,11 +120,13 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
                 if node.addr in eaddrs:
                     try:
                         ccfg_graph.remove_node(node)
+                        filtered_addr.add(node.addr)
                     except:
                         pass
                     for pnode in node.predecessors:
                         try:
                             ccfg_graph.remove_node(pnode)
+                            filtered_addr.add(node.addr)
                         except:
                             pass
         
@@ -113,6 +134,30 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
             for node in ccfg_graph.nodes():
                 if hasattr(node, 'is_simprocedure') and  hasattr(node, 'simprocedure_name') and node.is_simprocedure and node.simprocedure_name == "PathTerminator":
                     ccfg_graph.remove_node(node)
+                    filtered_addr.add(node.addr)
+
+    node_path = []
+    if path != None:
+        trace = list(filter(lambda _: _ not in filtered_addr, path.addr_trace))
+        for i in range(len(trace)):
+            nodes_at_addr = cfg.get_all_nodes(trace[i])
+            if len(nodes_at_addr) == 1:
+                node_path.append(nodes_at_addr[0])
+            else:
+                for n in nodes_at_addr:
+                    if node_matches(n, trace[:i+1]):
+                        node_path.append(n)
+                        break
+    
+    active_nodes = set(node_path)
+    active_edges = {}
+    
+    if len(node_path) > 0:
+        for s,t in zip(node_path[:-1],node_path[1:]):
+            if s not in active_edges:
+                active_edges[s] = set()
+            active_edges[s].add(t)
+
 
     for node in sorted(filter(lambda _: _ != None,ccfg_graph.nodes()), key=lambda _: _.addr):
         blocks[node.addr] = cfg.project.factory.block(addr=node.addr)
@@ -139,11 +184,13 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
         label += "}}"
 
         penwidth = 1
+        if node in active_nodes:
+            penwidth = 3
 
         if not node.is_simprocedure:
             nodes[nmap[node]] = Node(nmap[node], label=label, penwidth=penwidth, **default_node_attributes)
         else:
-            nodes[nmap[node]] = Node(nmap[node], rank="same", label=label, penwidth=penwidth, style="filled", fillcolor="#dddddd", **default_node_attributes)
+            nodes[nmap[node]] = Node(nmap[node], label=label, penwidth=penwidth, style="filled", fillcolor="#dddddd", **default_node_attributes)
         
         dot_graph.add_node(nodes[nmap[node]])
 
@@ -177,8 +224,10 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
                 color=EDGECOLOR_RET
             else:
                 color=EDGECOLOR_UNKNOWN
-            
+    
             penwidth=1
+            if source in active_edges and target in active_edges[source]:
+                penwidth=3
             
             edgeprop[key]= {
                 "color" : color,

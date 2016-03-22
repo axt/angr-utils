@@ -83,37 +83,35 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
     nmap = {}
     nidx = 0
     
-    ccfg_graph = cfg.graph.copy()
+    ccfg = cfg.copy()
                 
     if func_addr != None:
-        for node in ccfg_graph.nodes():
+        for node in ccfg.graph.nodes():
             if node.function_address not in func_addr:
-                ccfg_graph.remove_node(node)
+                ccfg.graph.remove_node(node)
 
     else:
         if remove_imports:
-            eaddrs = import_addrs(cfg.project)
-            for node in ccfg_graph.nodes():
-                if node == None: 
-                    continue
+            eaddrs = import_addrs(ccfg.project)
+            for node in ccfg.graph.nodes():
                 if node.addr in eaddrs:
                     try:
-                        ccfg_graph.remove_node(node)
+                        ccfg.graph.remove_node(node)
                     except:
                         pass
                     for pnode in node.predecessors:
                         try:
-                            ccfg_graph.remove_node(pnode)
+                            ccfg.graph.remove_node(pnode)
                         except:
                             pass
         
         if remove_path_terminator:
-            for node in ccfg_graph.nodes():
-                if hasattr(node, 'is_simprocedure') and  hasattr(node, 'simprocedure_name') and node.is_simprocedure and node.simprocedure_name == "PathTerminator":
-                    ccfg_graph.remove_node(node)
+            for node in ccfg.graph.nodes():
+                if node.is_simprocedure and node.simprocedure_name == "PathTerminator":
+                    ccfg.graph.remove_node(node)
 
-    for node in sorted(filter(lambda _: _ != None,ccfg_graph.nodes()), key=lambda _: _.addr):
-        blocks[node.addr] = cfg.project.factory.block(addr=node.addr)
+    for node in sorted(ccfg.graph.nodes(), key=lambda _: _.addr):
+        blocks[node.addr] = ccfg.project.factory.block(addr=node.addr)
     
         attributes=[]
         if node.is_simprocedure:
@@ -152,9 +150,7 @@ def plot_cfg(cfg, fname, format="png", asminst=False, vexinst=False, func_addr=N
     #            dot_graph.add_edge(Edge(nodes[nmap[nn[0]]],nodes[nmap[n]],style="invis"))
 
     edgeprop = {}    
-    for source,target in ccfg_graph.edges():
-        if source == None or target == None:
-            continue
+    for source,target in ccfg.graph.edges():
         key = (nmap[source], nmap[target])
 
         if not key in edgeprop:

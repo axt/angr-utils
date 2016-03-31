@@ -192,8 +192,10 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
         if not node.is_simprocedure:
             nodes[nmap[node]] = Node(nmap[node], label=label, penwidth=penwidth, **default_node_attributes)
         else:
-            nodes[nmap[node]] = Node(nmap[node], label=label, penwidth=penwidth, style="filled", fillcolor="#dddddd", **default_node_attributes)
-        
+            if node.simprocedure_name == "PathTerminator":
+                nodes[nmap[node]] = Node(nmap[node], label=label, penwidth=penwidth, style="filled", fillcolor="#dd5555", **default_node_attributes)
+            else:
+                nodes[nmap[node]] = Node(nmap[node], label=label, penwidth=penwidth, style="filled", fillcolor="#dddddd", **default_node_attributes)
         dot_graph.add_node(nodes[nmap[node]])
 
     #for n in ccfg.graph.nodes():
@@ -212,15 +214,18 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
         if not key in edgeprop:
             if blocks[source.addr].vex.jumpkind == 'Ijk_Boring':
                 if len(blocks[source.addr].vex.constant_jump_targets) > 1:
-                    if target.addr == blocks[source.addr].vex.next.constants[0].value:
-                        color=EDGECOLOR_CONDITIONAL_FALSE
+                    if len (blocks[source.addr].vex.next.constants) == 1:
+                        if target.addr == blocks[source.addr].vex.next.constants[0].value:
+                            color=EDGECOLOR_CONDITIONAL_FALSE
+                        else:
+                            color=EDGECOLOR_CONDITIONAL_TRUE
                     else:
-                        color=EDGECOLOR_CONDITIONAL_TRUE
+                        color=EDGECOLOR_UNKNOWN
                 else:
                     color=EDGECOLOR_UNCONDITIONAL
             elif blocks[source.addr].vex.jumpkind == 'Ijk_Call':
                 color=EDGECOLOR_CALL
-                if blocks[source.addr].vex.next.constants[0].value != target.addr:
+                if len (blocks[source.addr].vex.next.constants) == 1 and blocks[source.addr].vex.next.constants[0].value != target.addr:
                     edge_style='dotted'
             elif blocks[source.addr].vex.jumpkind == 'Ijk_Ret':
                 color=EDGECOLOR_RET

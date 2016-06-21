@@ -162,7 +162,6 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
 
 
     for node in sorted(filter(lambda _: _ != None,ccfg_graph.nodes()), key=lambda _: _.addr):
-        blocks[node.addr] = cfg.project.factory.block(addr=node.addr, max_size=node.size)
     
         attributes=[]
         if node.is_simprocedure:
@@ -171,8 +170,11 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
             attributes.append("SYSC")
         if node.no_ret:
             attributes.append("NORET")
-
-
+        if len(attributes) == 0:
+            blocks[node.addr] = cfg.project.factory.block(addr=node.addr, max_size=node.size)
+        else:
+            blocks[node.addr] = cfg.project.factory.block(addr=node.addr)
+        
         nmap[node] = nidx
         nidx += 1
         label = "{{<f0> {:#08x} ({:#08x}) {} {}".format(node.addr, node.function_address, node.name, ' '.join(attributes))

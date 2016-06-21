@@ -162,7 +162,7 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
 
 
     for node in sorted(filter(lambda _: _ != None,ccfg_graph.nodes()), key=lambda _: _.addr):
-        blocks[node.addr] = cfg.project.factory.block(addr=node.addr)
+        blocks[node.addr] = cfg.project.factory.block(addr=node.addr, max_size=node.size)
     
         attributes=[]
         if node.is_simprocedure:

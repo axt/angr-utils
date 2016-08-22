@@ -2,11 +2,14 @@ from distutils.core import setup
 
 setup(
     name='angr-utils',
-    version='0.0.6',
+    version='0.0.7',
     packages=['angrutils'],
     install_requires=[
         'pydot',
-	'networkx'
+        'networkx',
+        'angr',
+        'claripy',
+        'simuvex'
     ],
     description='Various utilities for angr binary analysis framework',
     url='https://github.com/axt/angr-utils',

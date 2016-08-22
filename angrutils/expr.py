@@ -6,7 +6,7 @@ def get_signed_range(se, expr):
     """
     size = expr.size()
     umin = umax = smin = smax = None
-    if not sat_zero():
+    if not sat_zero(se, expr):
         try: 
             umin = se.min(expr, extra_constraints=[se.Extract(size-1,size-1,expr) == 0])
             umax = se.max(expr, extra_constraints=[se.Extract(size-1,size-1,expr) == 0])

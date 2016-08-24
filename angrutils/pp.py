@@ -31,7 +31,9 @@ def addr_trace(arr, delimiter=",", cols=10, fmtwidth=8, level=0):
 
 def path(p, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
     ret = "\t"*level + "path '%s':\n" % p.path_id
-    ret += addr_trace(p.addr_trace.hardcopy, delimiter=delimiter, level=level+1, cols=cols, fmtwidth=fmtwidth)
+    trace = p.addr_trace.hardcopy
+    trace.append(p.addr)
+    ret += addr_trace(trace, delimiter=delimiter, level=level+1, cols=cols, fmtwidth=fmtwidth)
     return ret
     
 def pathgroup(pg, delimiter=" -> ", cols=10, fmtwidth=8, level=0):

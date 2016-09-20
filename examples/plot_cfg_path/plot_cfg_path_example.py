@@ -4,7 +4,7 @@ import angr
 import simuvex
 
 from angrutils import plot_cfg
-
+from angrutils.exploration import NormalizedSteps
 
 def analyze(b, addr, name=None):
     start_state = b.factory.blank_state(addr=addr)
@@ -17,6 +17,7 @@ def analyze(b, addr, name=None):
     start_state.stack_push(0x0)
     
     pg = b.factory.path_group(start_state)
+    pg.use_technique(NormalizedSteps(cfg))
     
     unique_states = set()
     def check_loops(path):
@@ -42,7 +43,7 @@ def analyze(b, addr, name=None):
             c += 1
     
 if __name__ == "__main__":
-    proj = angr.Project("../../../angr-doc/examples/ais3_crackme/ais3_crackme", load_options={'auto_load_libs':False})
+    proj = angr.Project("../samples/ais3_crackme", load_options={'auto_load_libs':False})
     main = proj.loader.main_bin.get_symbol("main")
     analyze(proj, main.addr, "ais3")
 

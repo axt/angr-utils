@@ -1,3 +1,6 @@
 pydot
 networkx
+angr
+claripy
+simuvex
 

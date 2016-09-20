@@ -29,13 +29,21 @@ default_edge_attributes = {
     'fontsize' : '8.0',
 }
 
+class XDot(pydot.Dot):
+    def __init__(self, content):
+        super(XDot, self).__init__()
+        self.content = content
+    def to_string(self):
+        return self.content
 
 class DotOutput(Output):
 
-    def __init__(self, fname, format='png', show=False):
+    def __init__(self, fname, format='png', show=False, pause=False):
         super(DotOutput, self).__init__()
         self.fname = fname
+        self.format = format
         self.show = show
+        self.pause = pause
 
     def render_attributes(self, default, attrs):
         a = {}
@@ -122,12 +130,15 @@ class DotOutput(Output):
             
         ret += "}\n"
                 
-        p = Popen(['xdot', '-'], stdin=PIPE)
-        p.stdin.write(ret)
-        p.stdin.flush()
-        p.stdin.close()
-        #p.wait()
-        #dot = pydot.Dot()
-        #print dot
-        #dot_graph.write("{}.{}".format(fname, format), format=format)
+        if self.show:
+            p = Popen(['xdot', '-'], stdin=PIPE)
+            p.stdin.write(ret)
+            p.stdin.flush()
+            p.stdin.close()
+            if self.pause:
+                p.wait()
+        
+        if self.fname:
+            dotfile = XDot(ret)
+            dotfile.write("{}.{}".format(self.fname, self.format), format=self.format)
 

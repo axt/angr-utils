@@ -16,7 +16,7 @@ def analyze(b, addr, name=None):
     plot_cfg(cfg, "%s_cfg_full" % (name), asminst=True, vexinst=True, debug_info=True, remove_imports=False, remove_path_terminator=False)
 
 if __name__ == "__main__":
-    proj = angr.Project("../../../angr-doc/examples/ais3_crackme/ais3_crackme", load_options={'auto_load_libs':False})
+    proj = angr.Project("../samples/ais3_crackme", load_options={'auto_load_libs':False})
     main = proj.loader.main_bin.get_symbol("main")
     analyze(proj, main.addr, "ais3")
 

@@ -66,7 +66,7 @@ class AngrColorEdgesVex(EdgeAnnotator):
                 edge.color = self.EDGECOLOR_RET
             elif jk == 'Ijk_FakeRet':
                 edge.color = self.EDGECOLOR_RET
-                edge.style = 'dotted'
+                edge.style = 'dashed'
             elif jk == 'Ijk_Call':
                 edge.color = self.EDGECOLOR_CALL
                 if len (vex.next.constants) == 1 and vex.next.constants[0].value != edge.dst.obj.addr:

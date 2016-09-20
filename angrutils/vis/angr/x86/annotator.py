@@ -43,6 +43,9 @@ class AngrColorEdgesAsm(EdgeAnnotator):
                         except Exception, e:
                             #TODO warning
                             edge.color = self.EDGECOLOR_UNKNOWN
+                    else:
+                        edge.color = self.EDGECOLOR_UNCONDITIONAL
+                        edge.style = 'dashed'
             else:
                 #TODO warning
                 edge.color = self.EDGECOLOR_UNKNOWN

@@ -18,7 +18,7 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
         vis.add_transformer(AngrRemoveImports(cfg.project))
         
     if func_addr:
-        vis.add_transformer(AngrFilterNodes(lambda node: node.obj.function_address == func_addr))
+        vis.add_transformer(AngrFilterNodes(lambda node: node.obj.function_address in func_addr and func_addr[node.obj.function_address]))
 
     vis.add_content(AngrCFGHead())
     vis.add_node_annotator(AngrColorSimprocedures())

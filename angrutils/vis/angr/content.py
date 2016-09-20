@@ -133,8 +133,6 @@ class AngrCFGDebugInfo(Content):
         
     def gen_render(self, n):
         node = n.obj
-        if node.is_simprocedure or node.is_syscall:
-            return None
 
         data = []
     

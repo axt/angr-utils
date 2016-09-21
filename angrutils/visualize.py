@@ -2,9 +2,9 @@ import networkx
 
 from collections import defaultdict
 
-from vis import DotOutput
-from vis.angr import *
-from vis.angr.x86 import *
+from bingraphvis import DotOutput
+from bingraphvis.angr import *
+from bingraphvis.angr.x86 import *
 
 # NOTE: kept for compatibility reason
 def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, debug_info=False):

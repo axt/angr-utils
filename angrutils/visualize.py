@@ -27,3 +27,8 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
     vis.set_output(DotOutput(fname, format=format))    
     vis.process(cfg.graph) 
 
+def plot_cg(kb, fname, format="png", verbose=False):
+    vis = AngrVisFactory().default_cg_pipeline(kb, verbose=verbose)
+    vis.set_output(DotOutput(fname, format=format))    
+    vis.process(kb) 
+    

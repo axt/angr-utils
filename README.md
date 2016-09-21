@@ -2,6 +2,11 @@
 
 Angr-utils is a collection of utilities for [angr](https://github.com/angr/angr) binary analysis framework.
 
+## ![warning](http://icons.veryicon.com/png/System/Onebit%201-3/warning.png)  Warning
+
+The visualization related code is under heavy development right now. The `plot_cfg` function in `visualize.py` is considered stable, if you want to avoid breaking changes, only rely on that.
+
+
 ## Functionality
 * Create fancy CFG-s
 * Thats all for now :)

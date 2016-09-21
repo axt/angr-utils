@@ -189,7 +189,6 @@ class AngrBackwardSliceAnnotatorAsm(ContentAnnotator):
                 caddr = s.addr
             if j in st:
                 staddr.add(caddr)
-        print map(hex,staddr)
         
         for c in content['data']:
             if c['_addr'] in staddr:

@@ -1,6 +1,6 @@
 
 from ..base import *
-
+import angr
 
 def safehex(val):
     return str(hex(val) if val != None else None)
@@ -39,6 +39,26 @@ class AngrCFGHead(Content):
             }], 
             'columns': self.get_columns()
         }
+
+class AngrCGHead(Content):
+    def __init__(self):
+        super(AngrCGHead, self).__init__('head', ['name','addr'])
+        
+    def gen_render(self, n):
+        node = n.obj
+        n.content[self.name] = {
+            'data': [{
+                'addr': {
+                    'content': "("+hex(n.obj.addr)+")"
+                },
+                'name': {
+                    'content': n.obj.name,
+                    'style':'B'
+                }
+            }], 
+            'columns': self.get_columns()
+        }
+
     
 class AngrAsm(Content):
     def __init__(self, project):
@@ -154,3 +174,95 @@ class AngrCFGDebugInfo(Content):
         }
 
 
+
+class AngrKbFunctionDetails(Content):
+        
+    def __init__(self):
+        super(AngrKbFunctionDetails, self).__init__('debug_info', ['prop', 'val'])
+
+    def add_line(self, data, prop, val):
+        data.append({
+            'prop' : {
+                'align': 'LEFT',
+                'content' : prop,
+                'style':'B'
+            },
+            'val' : {
+                'align': 'LEFT',
+                'content' : val
+            }
+        })
+
+    def sitespp(self, arg):
+        ret = []
+        for k in arg:
+            if isinstance(k, angr.knowledge.BlockNode):
+                ret.append(hex(k.addr))
+            elif isinstance(k, angr.knowledge.HookNode):
+                ret.append(hex(k.addr))
+            else:
+                ret.append("UNKNOWN")
+        return "[" + ",".join(ret) + "]"
+        
+    def gen_render(self, n):
+        fn = n.obj
+        
+        data = []
+        self.add_line(data, "addr", safehex(fn.addr))
+
+        attrs = []
+        if fn.is_plt:
+            attrs.append("PLT")
+        if fn.is_simprocedure:
+            attrs.append("SIMPROC")
+        if fn.is_syscall:
+            attrs.append("SYSCALL")
+        
+        if fn.has_return:
+            attrs.append("HASRET")
+        if fn.has_unresolved_calls:
+            attrs.append("UNRES_CALLS")
+        if fn.has_unresolved_jumps:
+            attrs.append("UNRES_JUMPS")
+        
+        if fn.returning == True:
+            attrs.append("RET")
+        elif fn.returning == False:
+            attrs.append("NO_RET+")
+        elif fn.returning == None:
+            attrs.append("NO_RET")
+
+        if fn.bp_on_stack:
+            attrs.append("BP_ON_STACK")
+        if fn.retaddr_on_stack:
+            attrs.append("RETADDR_ON_STACK")
+            
+        attrs.append("SP_DELTA_"+str(fn.sp_delta))
+        
+        self.add_line(data, "attributes", " ".join(attrs))    
+
+        self.add_line(data, "num_arguments", str(fn.num_arguments))
+        self.add_line(data, "arguments", str(fn.arguments))
+
+        #self.add_line(data, "block_addrs", str(map(safehex, fn.block_addrs)))
+
+        self.add_line(data, "call_convention", str(type(fn.call_convention)))
+        self.add_line(data, "callout_sites", self.sitespp(fn.callout_sites))
+        self.add_line(data, "jumpout_sites", self.sitespp(fn.jumpout_sites))
+        self.add_line(data, "get_call_sites", str(map(hex,fn.get_call_sites())))
+        self.add_line(data, "ret_sites", self.sitespp(fn.ret_sites))
+
+        #self.add_line(data, "prepared_registers", str(fn.prepared_registers))
+        #self.add_line(data, "prepared_stack_variables", str(fn.prepared_stack_variables))
+        #self.add_line(data, "registers_read_afterwards", str(fn.registers_read_afterwards))
+        #self.add_line(data, "get_call_return", str(fn.get_call_return(x)))
+        #self.add_line(data, "get_call_target", str(fn.get_call_target(x)))
+        
+        n.content[self.name] = {
+            'data': data,
+            'columns': self.get_columns(),
+        }
+
+
+    # 'block_addrs_set', 'blocks', 'callable', 'code_constants', 'endpoints', 'get_node', 'graph', 'info', 'instruction_size', 'local_runtime_values', 'mark_nonreturning_calls_endpoints', 
+    # 'nodes', 'normalize', 'operations', 'runtime_values', 'startpoint', 'string_references', 'subgraph', 'transition_graph'

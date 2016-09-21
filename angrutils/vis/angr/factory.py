@@ -22,3 +22,11 @@ class AngrVisFactory(object):
         elif asminst:
             vis.add_edge_annotator(AngrColorEdgesAsm())
         return vis
+
+    def default_cg_pipeline(self, kb, verbose=True):
+        vis = Vis()
+        vis.set_source(AngrKbCGSource())
+        vis.add_content(AngrCGHead())
+        if verbose:
+            vis.add_content(AngrKbFunctionDetails())
+        return vis

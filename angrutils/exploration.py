@@ -15,12 +15,6 @@ class NormalizedSteps(angr.exploration_techniques.ExplorationTechnique):
         return pg.step(stash=stash, **kwargs)
 
     def normalized_step(self, path):
-        # cfg-acc doesn't normalize this, so we use the graph for now
-        # node = self.cfg.get_any_node(path.addr)
-        node = None
-        for n in self.cfg.nodes():
-            if n.addr == path.addr:
-                node = n
-                break
+        node = self.cfg.get_any_node(path.addr)
         return path.step(num_inst=len(node.instruction_addrs) if node is not None else None)
 

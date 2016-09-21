@@ -67,7 +67,8 @@ class AngrAsm(Content):
                     'content': ins.op_str,
                     'align': 'LEFT'
                 },
-                '_ins': ins
+                '_ins': ins,
+                '_addr': ins.address
             })
             
         n.content[self.name] = {

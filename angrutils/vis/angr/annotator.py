@@ -2,6 +2,7 @@
 from ..base import *
 
 import capstone
+import pyvex
 
 class AngrColorSimprocedures(NodeAnnotator):
     def __init__(self):
@@ -135,3 +136,68 @@ class AngrPathAnnotator(EdgeAnnotator, NodeAnnotator):
         if self.node_hit(node.obj):
             node.width = 3
 
+
+class AngrBackwardSliceAnnotatorVex(ContentAnnotator):
+    def __init__(self, bs):
+        super(AngrBackwardSliceAnnotatorVex, self).__init__('vex')
+        self.bs = bs
+        self.targets = set(self.bs._targets)
+
+    def register(self, content):
+        content.add_column_before('taint')
+        
+    def annotate_content(self, node, content):
+        if node.obj.is_simprocedure or node.obj.is_syscall:
+            return
+
+        st =  self.bs.chosen_statements[node.obj.addr]        
+        for k in range(len(content['data'])):                
+            c = content['data'][k]
+            if k in st:
+                c['addr']['style'] = 'B'
+                c['statement']['style'] = 'B'
+                c['taint'] = {
+                    'content':'[*]',
+                    'style':'B'
+                }
+                if (node.obj, k) in self.targets:
+                    c['addr']['color'] = 'red'
+                    c['statement']['color'] = 'red'
+
+class AngrBackwardSliceAnnotatorAsm(ContentAnnotator):
+    def __init__(self, bs):
+        super(AngrBackwardSliceAnnotatorAsm, self).__init__('asm')
+        self.bs = bs
+        self.targets = set(self.bs._targets)
+
+    def register(self, content):
+        content.add_column_before('taint')
+        
+    def annotate_content(self, node, content):
+        if node.obj.is_simprocedure or node.obj.is_syscall:
+            return
+
+        st =  self.bs.chosen_statements[node.obj.addr]
+        staddr = set()
+
+        #TODO
+        vex = self.bs.project.factory.block(addr=node.obj.addr, max_size=node.obj.size).vex
+        
+        caddr = None
+        for j, s in enumerate(vex.statements):
+            if isinstance(s, pyvex.stmt.IMark):
+                caddr = s.addr
+            if j in st:
+                staddr.add(caddr)
+        print map(hex,staddr)
+        
+        for c in content['data']:
+            if c['_addr'] in staddr:
+                c['addr']['style'] = 'B'
+                c['mnemonic']['style'] = 'B'
+                c['operands']['style'] = 'B'
+                c['taint'] = {
+                    'content':'[*]',
+                    'style':'B'
+                }
+    

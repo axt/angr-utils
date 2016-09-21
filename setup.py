@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='angr-utils',
-    version='0.1.0',
+    version='0.1.1',
     packages=['angrutils', 'angrutils.vis', 'angrutils.vis.angr', 'angrutils.vis.angr.x86'],
     install_requires=[
         'pydot',

@@ -1,4 +1,0 @@
-
-
-from .annotator import *
-

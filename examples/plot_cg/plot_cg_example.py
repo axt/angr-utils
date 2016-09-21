@@ -7,7 +7,7 @@ from angrutils import *
 def analyze(b, addr, name=None):
     start_state = b.factory.blank_state(addr=addr)
     start_state.stack_push(0x0)
-    cfg = b.analyses.CFGAccurate(fail_fast=True, starts=[addr], initial_state=start_state, context_sensitivity_level=2, keep_state=True, call_depth=100, normalize=True)
+    cfg = b.analyses.CFGAccurate(fail_fast=False, starts=[addr], context_sensitivity_level=1, enable_function_hints=False, keep_state=True, enable_advanced_backward_slicing=False, enable_symbolic_back_traversal=False,normalize=True)
 
     plot_cg(b.kb, "%s_callgraph" % name, format="png")
     plot_cg(b.kb, "%s_callgraph_verbose" % name, format="png", verbose=True)

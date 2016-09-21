@@ -1,1 +1,1 @@
-BackwardSlice in angr is kind of broken, this example is here to demonstrate only the abilities of custom annotators in angrutils
+No source code is provided here. These are just conceptual graphs, to demonstrate future plans, but the API of this is not stabilized yet.

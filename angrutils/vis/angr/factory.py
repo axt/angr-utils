@@ -14,7 +14,8 @@ class AngrVisFactory(object):
         vis.add_content(AngrCFGHead())
         vis.add_node_annotator(AngrColorSimprocedures())
         if asminst:
-            vis.add_content(AngrAsm(project))        
+            vis.add_content(AngrAsm(project))
+            vis.add_content_annotator(AngrCommentsAsm(project))
         if vexinst:
             vis.add_content(AngrVex(project))
             vis.add_edge_annotator(AngrColorEdgesVex())

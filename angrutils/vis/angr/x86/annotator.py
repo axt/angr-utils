@@ -1,5 +1,6 @@
 
 from ...base import *
+import capstone
 from capstone.x86 import *
 
 
@@ -74,3 +75,40 @@ class AngrArrayAccessAnnotator(ContentAnnotator):
                                 }
                                 node.fillcolor = '#ffff33'
                                 node.style = 'filled'
+
+
+class AngrCommentsAsm(ContentAnnotator):
+    def __init__(self, project):
+        super(AngrCommentsAsm, self).__init__('asm')
+        self.project = project
+
+    def register(self, content):
+        content.add_column_after('comment')
+        
+    def annotate_content(self, node, content):
+        if node.obj.is_simprocedure or node.obj.is_syscall:
+            return
+        for k in content['data']:
+            ins = k['_ins']
+            if ins.group(capstone.CS_GRP_CALL):
+                caddr = ins.operands[0]
+                try:
+                    addr = int(caddr.value.imm)
+                    fm = self.project.kb.functions
+                    fname = None
+                    if addr in fm:
+                        fname = fm[addr].name
+                    
+                    if fname:
+                        if not ('comment' in k and 'content' in k['comment']):
+                            k['comment'] = {
+                                'content': "; "+ fname
+                            }
+                        else:
+                            k['comment']['content'] += ", " + fname
+                            
+                        k['comment']['color'] ='gray'
+                        k['comment']['align'] = 'LEFT'
+                except: 
+                    pass
+        

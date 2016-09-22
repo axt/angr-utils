@@ -6,7 +6,6 @@ from bingraphvis import DotOutput
 from bingraphvis.angr import *
 from bingraphvis.angr.x86 import *
 
-# NOTE: kept for compatibility reason
 def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, debug_info=False):
    
     vis = AngrVisFactory().default_cfg_pipeline(cfg.project, asminst=asminst, vexinst=vexinst)

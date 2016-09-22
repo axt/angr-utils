@@ -2,14 +2,16 @@
 
 Angr-utils is a collection of utilities for [angr](https://github.com/angr/angr) binary analysis framework.
 
-## ![warning](http://icons.veryicon.com/png/System/Onebit%201-3/warning.png)  Warning
+## Note
 
-The visualization related code is under heavy development right now. The `plot_cfg` function in `visualize.py` is considered stable, if you want to avoid breaking changes, only rely on that.
+Visualisation for various graphs (currently supported: CFG, CG; planned: DFG, CDG, DDG) has been moved to [bingraphvis](https://github.com/axt/bingraphvis).
 
+The facade functions in `visualize.py` are considered stable, and should not break between releases, although they provide only a limited subset of [bingraphvis](https://github.com/axt/bingraphvis) functionalities.
 
-## Functionality
-* Create fancy CFG-s
-* Thats all for now :)
+## Main functionality
+* CFG visualisation
+* Pretty printers
+* Utility functions
 
 ## Usage
 
@@ -25,6 +27,4 @@ cfg = proj.analyses.CFG(fail_fast=True, starts=[main.addr], initial_state=start_
 plot_cfg(cfg, "ais3_cfg", asminst=True, remove_imports=True, remove_path_terminator=True)  
 ```
 
-## TODO
-
-Well, a lot of things :-).
+See examples for more details.

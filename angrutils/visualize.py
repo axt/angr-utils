@@ -40,5 +40,5 @@ def plot_cdg(cfg, cdg, fname, format="png", pd_edges=False, cg_edges=True, remov
         vis.add_transformer(AngrAddEdges(cdg.get_post_dominators(), color="green", reverse=True))
     if cg_edges:
         vis.add_transformer(AngrAddEdges(cdg.graph, color="purple", reverse=False))
-    vis.set_output(DotOutput(fname, format=format, show=True))    
-    vis.process(cfg.graph) 
+    vis.set_output(DotOutput(fname, format=format))
+    vis.process(cfg.graph)

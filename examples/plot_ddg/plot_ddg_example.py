@@ -29,7 +29,8 @@ def analyze(b, addr, name=None):
         if isinstance(node.variable, SimMemoryVariable):
             mem_var_node = node
             subgraph = ddg.data_sub_graph(mem_var_node, simplified=True, killing_edges=True)
-            plot_ddg_data(subgraph, "%s_ddg_subgraph_%x" % (name, node.location.ins_addr), project=b)
+            if len(subgraph.nodes()) > 1:
+                plot_ddg_data(subgraph, "%s_ddg_subgraph_%x" % (name, node.location.ins_addr), project=b)
     
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ Angr-utils is a collection of utilities for [angr](https://github.com/angr/angr)
 
 Visualisation for various graphs (currently supported: CFG, CG; planned: DFG, CDG, DDG) has been moved to [bingraphvis](https://github.com/axt/bingraphvis).
 
-The facade functions in `visualize.py` are considered stable, and should not break between releases, although they provide only a limited subset of [bingraphvis](https://github.com/axt/bingraphvis) functionalities.
+The API of the facade functions in `visualize.py` are considered stable (except marked otherwise in comment), and should not break between releases, although they provide only a limited subset of [bingraphvis](https://github.com/axt/bingraphvis) functionalities.
 
 ## Main functionality
 * CFG visualisation

@@ -2,7 +2,7 @@
 
 import angr
 from angrutils import plot_cfg, plot_ddg_stmt, plot_ddg_data
-from simuvex import SimMemoryVariable
+from simuvex import SimMemoryVariable, SimStackVariable, SimRegisterVariable
 
 def analyze(b, addr, name=None):
     start_state = b.factory.blank_state(addr=addr)
@@ -24,13 +24,21 @@ def analyze(b, addr, name=None):
     plot_ddg_data(ddg.data_graph, "%s_ddg_data" % name, project=b)
     plot_ddg_data(ddg.simplified_data_graph, "%s_ddg_simplified_data" % name, project=b)
 
-    mem_var_node = None
     for node in ddg.simplified_data_graph.nodes_iter():
-        if isinstance(node.variable, SimMemoryVariable):
-            mem_var_node = node
-            subgraph = ddg.data_sub_graph(mem_var_node, simplified=True, killing_edges=True)
-            if len(subgraph.nodes()) > 1:
-                plot_ddg_data(subgraph, "%s_ddg_subgraph_%x" % (name, node.location.ins_addr), project=b)
+        if node.initial:
+            label = None
+            if isinstance(node.variable, SimStackVariable):
+                label = "stack_%s_%x" % (node.variable.base, node.variable.offset)
+            elif isinstance(node.variable, SimMemoryVariable):
+                label = "mem_"+hex(node.variable.addr)
+            elif isinstance(node.variable, SimRegisterVariable):
+                label = "reg_"+b.arch.register_names[node.variable.reg]
+            else:
+                raise NotImplementedError(type(node.variable))
+        
+            subgraph = ddg.data_sub_graph(node, simplified=False, killing_edges=True)
+            plot_ddg_data(subgraph, "%s_ddg_subgraph_%s" % (name, label), format="png", project=b)
+    
     
 
 if __name__ == "__main__":

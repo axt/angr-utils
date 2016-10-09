@@ -15,9 +15,13 @@ Statement graph | Data graph
 --- | --- 
 ![ddg_hr1][ddg_hr1] | ![ddg_hr2][ddg_hr2]
 
+## Type inference
+![signed][signed]
+
 [cfg_asm]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/cfg_asm_annotated.png
 [cfg_vex]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/cfg_vex_annotated.png
 [ddg_stmt]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/ddg_stmt.png
 [ddg_data]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/ddg_data.png
 [ddg_hr1]: http://i.imgur.com/CrrCRBW.png
 [ddg_hr2]: http://i.imgur.com/ekX0lxO.png
+[signed]: http://i.imgur.com/tKqvSeW.png

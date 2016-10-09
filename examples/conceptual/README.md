@@ -18,10 +18,10 @@ Statement graph | Data graph
 ## Type inference
 ![signed][signed]
 
-[cfg_asm]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/cfg_asm_annotated.png
-[cfg_vex]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/cfg_vex_annotated.png
-[ddg_stmt]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/ddg_stmt.png
-[ddg_data]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/conceptual/ddg_data.png
+[cfg_asm]: http://i.imgur.com/5Ls5Yx9.png
+[cfg_vex]: http://i.imgur.com/nMO62Ii.png
+[ddg_stmt]: http://i.imgur.com/OFzhJCJ.png
+[ddg_data]: http://i.imgur.com/iC0asgo.png
 [ddg_hr1]: http://i.imgur.com/CrrCRBW.png
 [ddg_hr2]: http://i.imgur.com/ekX0lxO.png
 [signed]: http://i.imgur.com/tKqvSeW.png

@@ -1,5 +1,8 @@
 No source code is provided here. These are just conceptual graphs, to demonstrate future plans, but the API of this is not stabilized yet.
 
+## Type inference
+![signed][signed]
+
 ## Taint tracking in cfg
 ASM | VEX
 --- | ---
@@ -15,8 +18,6 @@ Statement graph | Data graph
 --- | --- 
 ![ddg_hr1][ddg_hr1] | ![ddg_hr2][ddg_hr2]
 
-## Type inference
-![signed][signed]
 
 [cfg_asm]: http://i.imgur.com/5Ls5Yx9.png
 [cfg_vex]: http://i.imgur.com/nMO62Ii.png

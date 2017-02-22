@@ -11,8 +11,8 @@ def plot_common(graph, fname, format="png", type=True):
     vis.set_output(DotOutput(fname, format=format))
     vis.process(graph)
 
-def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, remove_simprocedures=False, debug_info=False):
-    vis = AngrVisFactory().default_cfg_pipeline(cfg.project, asminst=asminst, vexinst=vexinst)
+def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, remove_simprocedures=False, debug_info=False, comments=True):
+    vis = AngrVisFactory().default_cfg_pipeline(cfg.project, asminst=asminst, vexinst=vexinst, comments=comments)
     if remove_imports:
         vis.add_transformer(AngrRemoveImports(cfg.project))
     if remove_simprocedures:

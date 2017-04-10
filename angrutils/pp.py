@@ -14,6 +14,8 @@ def pp(obj, **kwargs):
         return ast(obj, **kwargs)
     elif isinstance(obj, simuvex.s_state.SimState):
         return state(obj, **kwargs)
+    elif isinstance(obj, simuvex.s_action.SimAction):
+        return action(obj, **kwargs)
     else:
         raise TypeError(type(obj))
     
@@ -60,6 +62,68 @@ def ast(obj, level=0, last=True):
     else:
         ret += "\t"*level + str(obj) + ("," if not last else "") + "\n"
     return ret
+
+def _regname(regidx, arch=None):
+    return arch.register_names[regidx] if arch else 'reg_'+str(regidx)
+    
+def action(obj, level=0, arch=None):
+    if obj.sim_procedure is not None:
+        location = "%s()" % obj.sim_procedure
+    else:
+        if obj.stmt_idx is not None:
+            location = "0x%x:%d" % (obj.bbl_addr, obj.stmt_idx)
+        else:
+            location = "0x%x" % obj.bbl_addr
+
+    s = "\t"*level + location + ": "
+    if obj.type == 'operation':
+        tmpit = iter(obj.tmp_deps)
+        exprit = iter(obj.exprs)
+        
+        s += "OP  " + obj.op + " "
+        for expr in exprit:
+            s += str(expr)
+            try:
+                s += "(t" + str(next(tmpit)) + ")"
+            except StopIteration:
+                pass
+            s += " "        
+    elif obj.type == 'exit':
+        #'all_objects', 'bbl_addr', 'condition', 'copy', 'downsize', 'exit_type', 'id', 'ins_addr', 'objects', 'reg_deps', 'sim_procedure', 'stmt_idx', 'target', 'tmp_deps', 'type'
+        s = "\t"*level + obj.__repr__()
+    elif obj.type == 'reg':
+        
+        #'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'reg_deps', 'sim_procedure', 'size', 'stmt_idx', 'tmp', 'tmp_deps', 'type'
+        if len(obj.reg_deps) == 0:
+            if len(obj.tmp_deps) == 0:
+                s += "REG " + obj.action + " " + _regname(obj.actual_addrs[0],arch) + " '" + str(obj.data)+"'"
+            elif len(obj.tmp_deps) == 1:
+                s += "REG " + obj.action + " " + _regname(obj.actual_addrs[0],arch) +  " t" +  str(next(iter(obj.tmp_deps)))
+            else:
+                import ipdb; ipdb.set_trace()
+        elif len(obj.reg_deps) == 1:
+            regidx = next(iter(obj.reg_deps))
+            s += "REG " + obj.action + " " +  _regname(regidx, arch) + " " + str(obj.tmp_deps) + " '" + str(obj.data)+"'"
+        else:
+            import ipdb; ipdb.set_trace()
+    elif obj.type == 'mem':
+        #'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'reg_deps', 'sim_procedure', 'size', 'stmt_idx', 'tmp', 'tmp_deps', 'type'
+        s += "MEM " + obj.action + " " + str(obj.reg_deps) + " " + str(obj.tmp_deps) + " " + str(obj.actual_addrs) + " " + str(obj.data)
+    elif obj.type == 'tmp':
+        # 'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'sim_procedure', 'size', 'stmt_idx'
+        s += "TMP " + obj.action + " t" +  str(obj.tmp)
+    elif obj.type == 'constraint':
+        s = "\t"*level + obj.__repr__()
+        #'all_objects', 'bbl_addr', 'condition', 'constraint', 'copy', 'downsize', 'id', 'ins_addr', 'objects', 'reg_deps', 'sim_procedure', 'stmt_idx', 'tmp_deps', 'type'
+    else:
+        s = "UNKNOWN" + str(dir(s))
+        import ipdb; ipdb.set_trace()
+    #'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'reg_deps', 'sim_procedure', 'size', 'stmt_idx', 'tmp', 'tmp_deps', 'type'
+    # type : reg, mem, tmp, operation, exit
+    # action: read/write
+    # operation : 'bbl_addr', 'ins_addr', 'sim_procedure', 'stmt_idx', 
+    
+    return s
 
 def _mem(se, reg):
     if reg.concrete:

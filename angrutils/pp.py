@@ -65,6 +65,16 @@ def ast(obj, level=0, last=True):
 
 def _regname(regidx, arch=None):
     return arch.register_names[regidx] if arch else 'reg_'+str(regidx)
+
+def _ao(obj, level=0, arch=None):
+    s = "\t"*level
+    if obj is not None:
+        s +=  str(obj.ast)
+        if len(obj.tmp_deps) > 0:
+            s +=  " " + str(map(lambda x: "t%d" % x, obj.tmp_deps)) 
+        if len(obj.reg_deps) > 0:
+            s +=  " " + str(map(lambda x: _regname(x, arch), obj.reg_deps)) 
+    return s
     
 def action(obj, level=0, arch=None):
     if obj.sim_procedure is not None:
@@ -75,54 +85,43 @@ def action(obj, level=0, arch=None):
         else:
             location = "0x%x" % obj.bbl_addr
 
-    s = "\t"*level + location + ": "
+    s = "\t"*level + location + "\t"
     if obj.type == 'operation':
         tmpit = iter(obj.tmp_deps)
-        exprit = iter(obj.exprs)
-        
-        s += "OP  " + obj.op + " "
+        exprit = iter(obj.exprs)        
+        s += "operation\t%s" % (obj.op)
         for expr in exprit:
-            s += str(expr)
+            s += "\te:["+str(expr.ast)
             try:
-                s += "(t" + str(next(tmpit)) + ")"
+                s += "[t" + str(next(tmpit)) + "]"
             except StopIteration:
                 pass
-            s += " "        
+            s += "] "
     elif obj.type == 'exit':
-        #'all_objects', 'bbl_addr', 'condition', 'copy', 'downsize', 'exit_type', 'id', 'ins_addr', 'objects', 'reg_deps', 'sim_procedure', 'stmt_idx', 'target', 'tmp_deps', 'type'
-        s = "\t"*level + obj.__repr__()
-    elif obj.type == 'reg':
-        
-        #'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'reg_deps', 'sim_procedure', 'size', 'stmt_idx', 'tmp', 'tmp_deps', 'type'
-        if len(obj.reg_deps) == 0:
-            if len(obj.tmp_deps) == 0:
-                s += "REG " + obj.action + " " + _regname(obj.actual_addrs[0],arch) + " '" + str(obj.data)+"'"
-            elif len(obj.tmp_deps) == 1:
-                s += "REG " + obj.action + " " + _regname(obj.actual_addrs[0],arch) +  " t" +  str(next(iter(obj.tmp_deps)))
-            else:
-                import ipdb; ipdb.set_trace()
-        elif len(obj.reg_deps) == 1:
-            regidx = next(iter(obj.reg_deps))
-            s += "REG " + obj.action + " " +  _regname(regidx, arch) + " " + str(obj.tmp_deps) + " '" + str(obj.data)+"'"
-        else:
-            import ipdb; ipdb.set_trace()
-    elif obj.type == 'mem':
-        #'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'reg_deps', 'sim_procedure', 'size', 'stmt_idx', 'tmp', 'tmp_deps', 'type'
-        s += "MEM " + obj.action + " " + str(obj.reg_deps) + " " + str(obj.tmp_deps) + " " + str(obj.actual_addrs) + " " + str(obj.data)
-    elif obj.type == 'tmp':
-        # 'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'sim_procedure', 'size', 'stmt_idx'
-        s += "TMP " + obj.action + " t" +  str(obj.tmp)
+        s += obj.type
+        s += "/" + obj.exit_type + " "
+        s += "target:" + _ao(obj.target, arch=arch) + " "
+        s += "cond:" + _ao(obj.condition, arch=arch) 
+
     elif obj.type == 'constraint':
-        s = "\t"*level + obj.__repr__()
-        #'all_objects', 'bbl_addr', 'condition', 'constraint', 'copy', 'downsize', 'id', 'ins_addr', 'objects', 'reg_deps', 'sim_procedure', 'stmt_idx', 'tmp_deps', 'type'
-    else:
-        s = "UNKNOWN" + str(dir(s))
-        import ipdb; ipdb.set_trace()
-    #'action', 'actual_addrs', 'actual_value', 'added_constraints', 'addr', 'all_objects', 'bbl_addr', 'condition', 'copy', 'data', 'downsize', 'fallback', 'fd', 'id', 'ins_addr', 'objects', 'offset', 'reg_deps', 'sim_procedure', 'size', 'stmt_idx', 'tmp', 'tmp_deps', 'type'
-    # type : reg, mem, tmp, operation, exit
-    # action: read/write
-    # operation : 'bbl_addr', 'ins_addr', 'sim_procedure', 'stmt_idx', 
-    
+        s += obj.type
+        s += "cons:" + _ao(obj.constraint, arch=arch) + " "
+        s += "cond:" + _ao(obj.condition, arch=arch) 
+    else: #SimActionData
+        s += obj.type
+        s += "/%s(%s) " % ('r' if obj.action == 'read' else 'w', _ao(obj.size, arch=arch))
+        if obj.type == 'reg':
+            s += _regname(obj.addr.ast,arch)
+        elif obj.type == 'tmp':
+            s += str("t%d"%obj.tmp)
+        else:
+            s += "\ta:[" + _ao(obj.addr, arch=arch) + "]"
+            
+        s += "\td:[" + _ao(obj.data, arch=arch) + "]"
+        if len(obj._tmp_dep) > 0:
+            s +=  " _tmp_dep: " + str(map(lambda x: "t%d" % x, obj._tmp_dep)) 
+        if len(obj._reg_dep) > 0:
+            s +=  " _reg_dep: " + str(map(lambda x: _regname(x, arch), obj._reg_dep)) 
     return s
 
 def _mem(se, reg):

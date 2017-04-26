@@ -15,6 +15,8 @@ The API of the facade functions in `visualize.py` are considered stable (except 
 
 ## Usage
 
+**See [examples][examples] for more details.**
+
 Plot fancy cfg-s:
 
 ```python
@@ -27,4 +29,7 @@ cfg = proj.analyses.CFG(fail_fast=True, starts=[main.addr], initial_state=start_
 plot_cfg(cfg, "ais3_cfg", asminst=True, remove_imports=True, remove_path_terminator=True)  
 ```
 
-See examples for more details.
+![cfg][cfg]
+
+[cfg]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/plot_cfg/ais3_cfg.png
+[examples]: https://github.com/axt/angr-utils/tree/master/examples

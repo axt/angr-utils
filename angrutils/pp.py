@@ -47,7 +47,10 @@ def pathgroup(pg, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
                 ret += path(p, delimiter=delimiter, level=level+2, cols=cols, fmtwidth=fmtwidth)
     return ret
 
-def ast(obj, level=0, last=True):
+def ast(obj, level=0, last=True, annotations=False):
+    def _to_str(annotations):
+        return " ".join(map(str, annotations))
+        
     ret = ""
     if hasattr(obj, 'op'):
         ret += "\t"*level + obj.op +"("
@@ -55,10 +58,13 @@ def ast(obj, level=0, last=True):
             ret += "\n"
             for argidx in range(len(obj.args)):
                 arg = obj.args[argidx]
-                ret += ast(arg, level=level+1, last=argidx==len(obj.args)-1)
-            ret += "\t"*level + ")" + ("," if not last else "") +"\n"
+                ret += ast(arg, level=level+1, last=argidx==len(obj.args)-1, annotations=annotations)
+            ret += "\t"*level + ")" 
         else:
-            ret += ",".join(map(str,obj.args)) + ")" + ("," if not last else "") + "\n"
+            ret += ",".join(map(str,obj.args)) + ")" 
+        if annotations and hasattr(obj, 'annotations') and len(obj.annotations)>0:
+            ret += " [" + _to_str(obj.annotations) + "]"
+        ret += ("," if not last else "") + "\n"
     else:
         ret += "\t"*level + str(obj) + ("," if not last else "") + "\n"
     return ret

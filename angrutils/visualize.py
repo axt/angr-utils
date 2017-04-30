@@ -12,7 +12,7 @@ def plot_common(graph, fname, format="png", type=True):
     vis.process(graph)
 
 def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, remove_simprocedures=False, debug_info=False, comments=True):
-    vis = AngrVisFactory().default_cfg_pipeline(cfg.project, asminst=asminst, vexinst=vexinst, comments=comments)
+    vis = AngrVisFactory().default_cfg_pipeline(cfg, asminst=asminst, vexinst=vexinst, comments=comments)
     if remove_imports:
         vis.add_transformer(AngrRemoveImports(cfg.project))
     if remove_simprocedures:
@@ -33,7 +33,7 @@ def plot_cg(kb, fname, format="png", verbose=False):
     vis.process(kb) 
     
 def plot_cdg(cfg, cdg, fname, format="png", pd_edges=False, cg_edges=True, remove_fakeret=True):
-    vis = AngrVisFactory().default_cfg_pipeline(cfg.project, asminst=True, vexinst=False, color_edges=False)
+    vis = AngrVisFactory().default_cfg_pipeline(cfg, asminst=True, vexinst=False, color_edges=False)
     if remove_fakeret:
         vis.add_transformer(AngrRemoveFakeretEdges())
     if pd_edges:

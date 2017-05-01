@@ -47,26 +47,44 @@ def pathgroup(pg, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
                 ret += path(p, delimiter=delimiter, level=level+2, cols=cols, fmtwidth=fmtwidth)
     return ret
 
-def ast(obj, level=0, last=True, annotations=False):
-    def _to_str(annotations):
-        return " ".join(map(str, annotations))
-        
+def ast(obj, level=0, last=True, inner=False, annotations=False, indent='\t'):
+    def _ann_to_str(annotations):
+        return ",".join(map(str, annotations))    
+    def _par_to_str(param):
+        if param is None:
+            return 'None'
+        elif isinstance(param, (int,long)):
+            return hex(param)
+        elif isinstance(param, (str)):
+            return "'" + param + "'"
+        else:
+            return param
+    if indent:
+        if isinstance(indent, bool):
+            indent = '\t'
+        if isinstance(indent, int):
+            indent = ' '*indent;
+        nl = "\n"
+        sp = indent*level
+    else:
+        nl = ""
+        sp = ""
     ret = ""
     if hasattr(obj, 'op'):
-        ret += "\t"*level + obj.op +"("
+        ret += sp + obj.op +"("
         if any([hasattr(arg, 'op') for arg in obj.args]):
-            ret += "\n"
+            ret += nl
             for argidx in range(len(obj.args)):
                 arg = obj.args[argidx]
-                ret += ast(arg, level=level+1, last=argidx==len(obj.args)-1, annotations=annotations)
-            ret += "\t"*level + ")" 
+                ret += ast(arg, level=level+1, last=argidx==len(obj.args)-1, annotations=annotations, inner=True, indent=indent)
+            ret += sp + ")" 
         else:
-            ret += ",".join(map(str,obj.args)) + ")" 
+            ret += ",".join(map(_par_to_str,obj.args)) + ")" 
         if annotations and hasattr(obj, 'annotations') and len(obj.annotations)>0:
-            ret += " [" + _to_str(obj.annotations) + "]"
-        ret += ("," if not last else "") + "\n"
+            ret += "{{" + _ann_to_str(obj.annotations) + "}}"
+        ret += ("," if not last else "") + (nl if inner else "")
     else:
-        ret += "\t"*level + str(obj) + ("," if not last else "") + "\n"
+        ret += sp + str(obj) + ("," if not last else "") + (nl if inner else "")
     return ret
 
 def _regname(regidx, arch=None):

@@ -27,6 +27,11 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
     vis.set_output(DotOutput(fname, format=format))    
     vis.process(cfg.graph) 
 
+def plot_func_graph(project, graph, fname, format="png", asminst=True, ailinst=True, vexinst=False):
+    vis = AngrVisFactory().default_func_graph_pipeline(project, graph, asminst=asminst, ailinst=ailinst, vexinst=vexinst)
+    vis.set_output(DotOutput(fname, format=format))    
+    vis.process(graph) 
+
 def plot_cg(kb, fname, format="png", verbose=False, filter=None):
     vis = AngrVisFactory().default_cg_pipeline(kb, verbose=verbose)
     vis.set_output(DotOutput(fname, format=format))    

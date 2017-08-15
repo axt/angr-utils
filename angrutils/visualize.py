@@ -27,8 +27,10 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
     vis.set_output(DotOutput(fname, format=format))    
     vis.process(cfg.graph) 
 
-def plot_func_graph(project, graph, fname, format="png", asminst=True, ailinst=True, vexinst=False):
+def plot_func_graph(project, graph, fname, format="png", asminst=True, ailinst=True, vexinst=False, structure=None):
     vis = AngrVisFactory().default_func_graph_pipeline(project, graph, asminst=asminst, ailinst=ailinst, vexinst=vexinst)
+    if structure:
+        vis.add_clusterer(AngrStructuredClusterer(structure))
     vis.set_output(DotOutput(fname, format=format))    
     vis.process(graph) 
 

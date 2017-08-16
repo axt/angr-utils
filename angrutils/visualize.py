@@ -11,7 +11,7 @@ def plot_common(graph, fname, format="png", type=True):
     vis.set_output(DotOutput(fname, format=format))
     vis.process(graph)
 
-def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, remove_simprocedures=False, debug_info=False, comments=True):
+def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, remove_simprocedures=False, debug_info=False, comments=True, color_depth=False):
     vis = AngrVisFactory().default_cfg_pipeline(cfg, asminst=asminst, vexinst=vexinst, comments=comments)
     if remove_imports:
         vis.add_transformer(AngrRemoveImports(cfg.project))
@@ -24,13 +24,18 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
     if path:
         vis.add_edge_annotator(AngrPathAnnotator(path))
         vis.add_node_annotator(AngrPathAnnotator(path))
+    if color_depth:
+        vis.add_clusterer(AngrCallstackKeyClusterer())
+        vis.add_clusterer(ColorDepthClusterer(palette='grays'))
     vis.set_output(DotOutput(fname, format=format))    
     vis.process(cfg.graph) 
 
-def plot_func_graph(project, graph, fname, format="png", asminst=True, ailinst=True, vexinst=False, structure=None):
+def plot_func_graph(project, graph, fname, format="png", asminst=True, ailinst=True, vexinst=False, structure=None, color_depth=False):
     vis = AngrVisFactory().default_func_graph_pipeline(project, graph, asminst=asminst, ailinst=ailinst, vexinst=vexinst)
     if structure:
         vis.add_clusterer(AngrStructuredClusterer(structure))
+        if color_depth:
+            vis.add_clusterer(ColorDepthClusterer(palette='greens'))
     vis.set_output(DotOutput(fname, format=format))    
     vis.process(graph) 
 

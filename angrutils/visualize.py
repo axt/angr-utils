@@ -26,7 +26,7 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
         vis.add_node_annotator(AngrPathAnnotator(path))
     if color_depth:
         vis.add_clusterer(AngrCallstackKeyClusterer())
-        vis.add_clusterer(ColorDepthClusterer(palette='grays'))
+        vis.add_clusterer(ColorDepthClusterer(palette='greens'))
     vis.set_output(DotOutput(fname, format=format))    
     vis.process(cfg.graph) 
 

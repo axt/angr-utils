@@ -8,6 +8,8 @@ Visualisation for various graphs (currently supported: CFG, CG; planned: DFG, CD
 
 The API of the facade functions in `visualize.py` are considered stable (except marked otherwise in comment), and should not break between releases, although they provide only a limited subset of [bingraphvis](https://github.com/axt/bingraphvis) functionalities.
 
+This tool is not designed to support interactive CFGs. For full interactivity, check out [angr-management](https://github.com/angr/angr-management), for navigable static CFGs check out [cfg-explorer](https://github.com/axt/cfg-explorer).
+
 ## Main functionality
 * CFG visualisation
 * Pretty printers

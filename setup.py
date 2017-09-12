@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='angr-utils',
-    version='0.3.0',
+    version='0.4.0',
     author='Attila Axt',
     author_email='axt@load.hu',
     license='BSD',
@@ -14,7 +14,7 @@ setup(
         'angr',
         'claripy',
         'simuvex',
-        'bingraphvis >= 0.1.0'
+        'bingraphvis >= 0.2.0'
     ],
     description='Various utilities for angr binary analysis framework',
     long_description='Various utilities for angr binary analysis framework',

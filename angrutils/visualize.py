@@ -36,13 +36,21 @@ def plot_func_graph(project, graph, fname, format="png", asminst=True, ailinst=T
         vis.add_clusterer(AngrStructuredClusterer(structure))
         if color_depth:
             vis.add_clusterer(ColorDepthClusterer(palette='greens'))
-    vis.set_output(DotOutput(fname, format=format))    
+    vis.set_output(DotOutput(fname, format=format))
     vis.process(graph) 
+
+#Note: method signature may be changed in the future
+def plot_structured_graph(project, structure, fname, format="png", asminst=True, ailinst=True, vexinst=False, color_depth=False):
+    vis = AngrVisFactory().default_structured_graph_pipeline(project, asminst=asminst, ailinst=ailinst, vexinst=vexinst)
+    if color_depth:
+        vis.add_clusterer(ColorDepthClusterer(palette='greens'))
+    vis.set_output(DotOutput(fname, format=format))
+    vis.process(structure)
 
 def plot_cg(kb, fname, format="png", verbose=False, filter=None):
     vis = AngrVisFactory().default_cg_pipeline(kb, verbose=verbose)
-    vis.set_output(DotOutput(fname, format=format))    
-    vis.process(kb, filter) 
+    vis.set_output(DotOutput(fname, format=format))
+    vis.process(kb, filter)
     
 def plot_cdg(cfg, cdg, fname, format="png", pd_edges=False, cg_edges=True, remove_fakeret=True):
     vis = AngrVisFactory().default_cfg_pipeline(cfg, asminst=True, vexinst=False, color_edges=False)
@@ -76,7 +84,7 @@ def plot_ddg_data(ddg_data, fname, format="png", project=None, asminst=False, ve
     vis.set_source(AngrCommonSource())
     vis.add_content(AngrDDGLocationHead())
     vis.add_content(AngrDDGVariableHead(project=project))
-    
+
     if project:
         if asminst:
             vis.add_content(AngrAsm(project))

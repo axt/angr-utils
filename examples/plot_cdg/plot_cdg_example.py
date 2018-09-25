@@ -18,9 +18,9 @@ def analyze(b, addr, name=None):
 
 if __name__ == "__main__":
     proj = angr.Project("../samples/1.6.26-libjsound.so", load_options={'auto_load_libs':False, 'main_opts': {'custom_base_addr': 0x0}})
-    main = proj.loader.main_bin.get_symbol("Java_com_sun_media_sound_MixerSequencer_nAddControllerEventCallback")
+    main = proj.loader.main_object.get_symbol("Java_com_sun_media_sound_MixerSequencer_nAddControllerEventCallback")
     analyze(proj, main.addr, "libjsound")
 
     proj = angr.Project("../samples/simple1", load_options={'auto_load_libs':False})
-    main = proj.loader.main_bin.get_symbol("main")
+    main = proj.loader.main_object.get_symbol("main")
     analyze(proj, main.addr, "simple1")

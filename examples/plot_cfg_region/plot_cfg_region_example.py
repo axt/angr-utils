@@ -7,7 +7,7 @@ from angrutils import plot_func_graph
 def analyze(b, addr, name=None):
     start_state = b.factory.blank_state(addr=addr)
     start_state.stack_push(0x0)
-    cfg = b.analyses.CFGAccurate(fail_fast=True, starts=[addr], initial_state=start_state, context_sensitivity_level=2, keep_state=True, call_depth=100, normalize=True)
+    cfg = b.analyses.CFGFast(fail_fast=True, function_starts=[addr], base_state=start_state, normalize=True)
 
     for func in b.kb.functions.values():
         try:

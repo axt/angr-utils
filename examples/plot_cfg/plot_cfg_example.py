@@ -7,7 +7,7 @@ from angrutils import plot_cfg
 def analyze(b, addr, name=None):
     start_state = b.factory.blank_state(addr=addr)
     start_state.stack_push(0x0)
-    cfg = b.analyses.CFGAccurate(fail_fast=True, starts=[addr], initial_state=start_state, context_sensitivity_level=2, keep_state=True, call_depth=100, normalize=True)
+    cfg = b.analyses.CFGFast(fail_fast=True, function_starts=[addr], base_state=start_state, normalize=True)
     for addr,func in proj.kb.functions.iteritems():
         if func.name in ['main','verify']:
             plot_cfg(cfg, "%s_%s_cfg" % (name, func.name), asminst=True, vexinst=False, func_addr={addr:True}, debug_info=False, remove_imports=True, remove_path_terminator=True)

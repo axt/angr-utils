@@ -34,11 +34,11 @@ def analyze(b, addr, name=None):
         return lsimgr
 
     simgr.run(step_func=step_func, until=lambda lsimgr: len(lsimgr.active) == 0, n=100)
-    print 1
+
     for stash in simgr.stashes:
         c = 0
-        for p in simgr.stashes[stash]:
-            plot_cfg(cfg, "%s_cfg_%s_%d" % (name, stash, c), path=p, asminst=True, vexinst=False, debug_info=False, remove_imports=True, remove_path_terminator=True)
+        for state in simgr.stashes[stash]:
+            plot_cfg(cfg, "%s_cfg_%s_%d" % (name, stash, c), state=state, asminst=True, vexinst=False, debug_info=False, remove_imports=True, remove_path_terminator=True)
             c += 1
     
 if __name__ == "__main__":

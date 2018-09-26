@@ -7,7 +7,7 @@ from simuvex import SimMemoryVariable, SimStackVariable, SimRegisterVariable
 def analyze(b, addr, name=None):
     start_state = b.factory.blank_state(addr=addr)
     start_state.stack_push(0x0)
-    cfg = b.analyses.CFGFast(fail_fast=True, function_starts=[addr], base_state=start_state, normalize=True)
+    cfg = b.analyses.CFGAccurate(fail_fast=True, starts=[addr], initial_state=start_state, context_sensitivity_level=2, keep_state=True, call_depth=100, normalize=True)
 
     plot_cfg(cfg, "%s_cfg" % (name), asminst=True, vexinst=True, debug_info=False, remove_imports=True, remove_path_terminator=True)
 
@@ -24,7 +24,7 @@ def analyze(b, addr, name=None):
     plot_ddg_data(ddg.data_graph, "%s_ddg_data" % name, project=b)
     plot_ddg_data(ddg.simplified_data_graph, "%s_ddg_simplified_data" % name, project=b)
 
-    for node in ddg.simplified_data_graph.nodes_iter():
+    for node in ddg.simplified_data_graph.nodes():
         if node.initial:
             label = None
             if isinstance(node.variable, SimStackVariable):

@@ -19,7 +19,7 @@ def pp(obj, **kwargs):
     else:
         raise TypeError(type(obj))
     
-def addr_trace(arr, delimiter=",", cols=10, fmtwidth=8, level=0):
+def bbl_addrs(arr, delimiter=",", cols=10, fmtwidth=8, level=0):
     ret = ""
     for i in range(len(arr)):
         if i % cols == 0:
@@ -33,9 +33,9 @@ def addr_trace(arr, delimiter=",", cols=10, fmtwidth=8, level=0):
 
 def path(p, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
     ret = "\t"*level + "path '%s':\n" % p.path_id
-    trace = p.addr_trace.hardcopy
+    trace = p.history.bbl_addrs.hardcopy
     trace.append(p.addr)
-    ret += addr_trace(trace, delimiter=delimiter, level=level+1, cols=cols, fmtwidth=fmtwidth)
+    ret += bbl_addrs(trace, delimiter=delimiter, level=level+1, cols=cols, fmtwidth=fmtwidth)
     return ret
     
 def pathgroup(pg, delimiter=" -> ", cols=10, fmtwidth=8, level=0):

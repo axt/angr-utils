@@ -21,9 +21,9 @@ def analyze(b, addr, name=None):
     
     unique_states = set()
     def check_loops(path):
-        last = path.addr_trace[-1]
+        last = path.history.bbl_addrs[-1]
         c = 0
-        for p in path.addr_trace:
+        for p in path.history.bbl_addrs:
             if p ==  last:
                c += 1 
         return c > 1

@@ -24,7 +24,7 @@ def analyze(b, addr, name=None):
     plot_ddg_data(ddg.data_graph, "%s_ddg_data" % name, project=b)
     plot_ddg_data(ddg.simplified_data_graph, "%s_ddg_simplified_data" % name, project=b)
 
-    for node in ddg.simplified_data_graph.nodes_iter():
+    for node in ddg.simplified_data_graph.nodes():
         if node.initial:
             label = None
             if isinstance(node.variable, SimStackVariable):
@@ -43,5 +43,5 @@ def analyze(b, addr, name=None):
 
 if __name__ == "__main__":
     proj = angr.Project("../samples/simple1", load_options={'auto_load_libs':False})
-    main = proj.loader.main_bin.get_symbol("main")
-    analyze(proj, main.addr, "simple1")
+    main = proj.loader.main_object.get_symbol("main")
+    analyze(proj, main.rebased_addr, "simple1")

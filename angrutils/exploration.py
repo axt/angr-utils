@@ -10,11 +10,11 @@ class NormalizedSteps(angr.exploration_techniques.ExplorationTechnique):
         super(NormalizedSteps, self).__init__()
         self.cfg = cfg
 
-    def step(self, pg, stash, **kwargs):
+    def step(self, simgr, stash, **kwargs):
         kwargs['successor_func'] = self.normalized_step
-        return pg.step(stash=stash, **kwargs)
+        return simgr.step(stash=stash, **kwargs)
 
-    def normalized_step(self, path):
-        node = self.cfg.get_any_node(path.addr)
-        return path.step(num_inst=len(node.instruction_addrs) if node is not None else None)
+    def normalized_step(self, state):
+        node = self.cfg.get_any_node(state.addr)
+        return state.step(num_inst=len(node.instruction_addrs) if node is not None else None)
 

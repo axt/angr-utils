@@ -6,20 +6,18 @@ import simuvex
 from expr import *
 
 def pp(obj, **kwargs):
-    if isinstance(obj, angr.path_group.PathGroup):
-        return pathgroup(obj, **kwargs)
-    elif isinstance(obj, angr.path.Path):
-        return path(obj, **kwargs)
+    if isinstance(obj, angr.sim_manager.SimulationManager):
+        return sim_manager(obj, **kwargs)
+    elif isinstance(obj, angr.sim_state.SimState):
+        return state(obj, **kwargs)
+    elif isinstance(obj, angr.state_plugins.sim_action.SimAction):
+        return action(obj, **kwargs)
     elif isinstance(obj, claripy.ast.base.Base):
         return ast(obj, **kwargs)
-    elif isinstance(obj, simuvex.s_state.SimState):
-        return state(obj, **kwargs)
-    elif isinstance(obj, simuvex.s_action.SimAction):
-        return action(obj, **kwargs)
     else:
         raise TypeError(type(obj))
     
-def addr_trace(arr, delimiter=",", cols=10, fmtwidth=8, level=0):
+def bbl_addrs(arr, delimiter=",", cols=10, fmtwidth=8, level=0):
     ret = ""
     for i in range(len(arr)):
         if i % cols == 0:
@@ -31,20 +29,20 @@ def addr_trace(arr, delimiter=",", cols=10, fmtwidth=8, level=0):
             ret += "\n"
     return ret
 
-def path(p, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
-    ret = "\t"*level + "path '%s':\n" % p.path_id
-    trace = p.addr_trace.hardcopy
-    trace.append(p.addr)
-    ret += addr_trace(trace, delimiter=delimiter, level=level+1, cols=cols, fmtwidth=fmtwidth)
+def sim_state(state, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
+    ret = "\t"*level + "sim_state '%#x':\n" % state.addr
+    trace = state.history.bbl_addrs.hardcopy
+    trace.append(state.addr)
+    ret += bbl_addrs(trace, delimiter=delimiter, level=level+1, cols=cols, fmtwidth=fmtwidth)
     return ret
     
-def pathgroup(pg, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
-    ret = "\t" * level + "pathgroups\n"
-    for sname, stash in pg.stashes.iteritems():
+def sim_manager(simgr, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
+    ret = "\t" * level + "sim_manager\n"
+    for sname, stash in simgr.stashes.iteritems():
         if len(stash) > 0:
             ret += ("\t" * (level+1) + "%s %d\n") % (sname,len(stash))
-            for p in stash:
-                ret += path(p, delimiter=delimiter, level=level+2, cols=cols, fmtwidth=fmtwidth)
+            for state in stash:
+                ret += sim_state(state, delimiter=delimiter, level=level+2, cols=cols, fmtwidth=fmtwidth)
     return ret
 
 def ast(obj, level=0, last=True, inner=False, annotations=False, indent='\t'):
@@ -63,7 +61,7 @@ def ast(obj, level=0, last=True, inner=False, annotations=False, indent='\t'):
         if isinstance(indent, bool):
             indent = '\t'
         if isinstance(indent, int):
-            indent = ' '*indent;
+            indent = ' '*indent
         nl = "\n"
         sp = indent*level
     else:
@@ -148,7 +146,7 @@ def action(obj, level=0, arch=None):
             s +=  " _reg_dep: " + str(map(lambda x: _regname(x, arch), obj._reg_dep)) 
     return s
 
-def _mem(se, reg):
+def _mem(se, reg):# TODO: better handle 64bit
     if reg.concrete:
         return "%08x" % reg.args[0]
     elif reg.symbolic:
@@ -163,18 +161,18 @@ def _mem(se, reg):
     
 def state(state, level=0, regs=True, stack=True, stackrange=[0,32], header=True):
     ret = ""
+    x86_regs = ['eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'ebp', 'esp', 'eip']
+    x86_64_regs = ['rax', 'rbx', 'rcx', 'rdx', 'rsi', 'rdi', 'rbp', 'rsp', 'rip']
+    reg_set = None
     if regs:
         if header:
             ret += "\t"*level + "====== Registers ======\n"
-        ret += "\t"*level + "EAX: %s\n" % _mem(state.se, state.regs.eax)
-        ret += "\t"*level + "EBX: %s\n" % _mem(state.se, state.regs.ebx)
-        ret += "\t"*level + "ECX: %s\n" % _mem(state.se, state.regs.ecx)
-        ret += "\t"*level + "EDX: %s\n" % _mem(state.se, state.regs.edx)
-        ret += "\t"*level + "ESI: %s\n" % _mem(state.se, state.regs.esi)
-        ret += "\t"*level + "EDI: %s\n" % _mem(state.se, state.regs.edi)
-        ret += "\t"*level + "EBP: %s\n" % _mem(state.se, state.regs.ebp)
-        ret += "\t"*level + "ESP: %s\n" % _mem(state.se, state.regs.esp)
-        ret += "\t"*level + "EIP: %s\n" % _mem(state.se, state.regs.eip)
+        if isinstance(state.arch, angr.archinfo.arch_amd64.ArchAMD64):
+            reg_set = x86_64_regs
+        if isinstance(state.arch, angr.archinfo.arch_x86.ArchX86):
+            reg_set = x86_regs
+        for reg in reg_set:
+            ret += "\t"*level + "%s: %s\n" % (reg.upper(), _mem(state.se, getattr(state.regs, reg)))
     if stack:
         if header:
             ret += "\t"*level + "======== Stack ========\n"

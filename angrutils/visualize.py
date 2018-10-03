@@ -11,7 +11,7 @@ def plot_common(graph, fname, format="png", type=True):
     vis.set_output(DotOutput(fname, format=format))
     vis.process(graph)
 
-def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, remove_simprocedures=False, debug_info=False, comments=True, color_depth=False):
+def plot_cfg(cfg, fname, format="png", state=None, asminst=False, vexinst=False, func_addr=None, remove_imports=True, remove_path_terminator=True, remove_simprocedures=False, debug_info=False, comments=True, color_depth=False):
     vis = AngrVisFactory().default_cfg_pipeline(cfg, asminst=asminst, vexinst=vexinst, comments=comments)
     if remove_imports:
         vis.add_transformer(AngrRemoveImports(cfg.project))
@@ -21,9 +21,9 @@ def plot_cfg(cfg, fname, format="png", path=None, asminst=False, vexinst=False, 
         vis.add_transformer(AngrFilterNodes(lambda node: node.obj.function_address in func_addr and func_addr[node.obj.function_address]))
     if debug_info:
         vis.add_content(AngrCFGDebugInfo())
-    if path:
-        vis.add_edge_annotator(AngrPathAnnotator(path))
-        vis.add_node_annotator(AngrPathAnnotator(path))
+    if state:
+        vis.add_edge_annotator(AngrPathAnnotator(state))
+        vis.add_node_annotator(AngrPathAnnotator(state))
     if color_depth:
         vis.add_clusterer(AngrCallstackKeyClusterer())
         vis.add_clusterer(ColorDepthClusterer(palette='greens'))

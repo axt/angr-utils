@@ -11,6 +11,6 @@ def analyze(b, name):
             plot_func_graph(b, func.transition_graph, "%s_%s_cfg" % (name, func.name), asminst=True, vexinst=False)
 
 if __name__ == "__main__":
-    proj = angr.Project("../samples/1.6.26-libjsound.so", load_options={'auto_load_libs':False, 'main_opts':{'custom_base_addr':0}})
+    proj = angr.Project("../samples/1.6.26-libjsound.so", load_options={'auto_load_libs':False, 'main_opts':{'base_addr':0}})
     analyze(proj, "libjsound")
 

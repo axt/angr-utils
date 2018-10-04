@@ -15,6 +15,14 @@ This tool is not designed to support interactive CFGs. For full interactivity, c
 * Pretty printers
 * Utility functions
 
+## Install
+```
+cd angr-dev
+git clone https://github.com/axt/bingraphvis
+pip install -e ./bingraphvis
+git clone https://github.com/axt/angr-utils
+pip install -e ./angr-utils
+```
 ## Usage
 
 **See [examples][examples] for more details.**

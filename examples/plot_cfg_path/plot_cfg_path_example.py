@@ -29,7 +29,7 @@ def analyze(b, addr, name=None):
     def step_func(lsimgr):
         lsimgr.stash(filter_func=check_loops, from_stash='active', to_stash='looping')
         lsimgr.stash(filter_func=lambda state: state.addr == 0, from_stash='active', to_stash='found')
-        print lsimgr
+        print(lsimgr)
         return lsimgr
 
     simgr.run(step_func=step_func, until=lambda lsimgr: len(lsimgr.active) == 0, n=100)

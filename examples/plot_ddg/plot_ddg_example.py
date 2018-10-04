@@ -17,7 +17,7 @@ def analyze(b, addr, name=None):
     plot_ddg_stmt(ddg.graph, "%s_ddg_stmt" % name, project=b)
 
     ddg._build_function_dependency_graphs()
-    for k,v in ddg._function_data_dependencies.iteritems():
+    for k,v in ddg._function_data_dependencies.items():
         plot_ddg_stmt(v, "%s_fdg_stmt_%x" % (name, k.addr), project=b)
     
     

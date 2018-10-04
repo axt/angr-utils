@@ -6,6 +6,9 @@ from bingraphvis import *
 from bingraphvis.angr import *
 from bingraphvis.angr.x86 import *
 
+def set_plot_style(c):
+    set_style(c)
+
 def plot_common(graph, fname, format="png", type=True):
     vis = AngrVisFactory().default_common_graph_pipeline(type=type)
     vis.set_output(DotOutput(fname, format=format))

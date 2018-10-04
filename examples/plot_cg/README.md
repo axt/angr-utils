@@ -7,5 +7,5 @@
 ![cg_verbose][cg_verbose]
 
 
-[cg]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/plot_cg/jsound_callgraph.png
-[cg_verbose]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/plot_cg/jsound_callgraph_verbose.png
+[cg]: https://i.imgur.com/beyCNkE.png
+[cg_verbose]: https://i.imgur.com/hieheqN.png

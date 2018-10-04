@@ -33,5 +33,5 @@ plot_cfg(cfg, "ais3_cfg", asminst=True, remove_imports=True, remove_path_termina
 
 ![cfg][cfg]
 
-[cfg]: https://raw.githubusercontent.com/axt/angr-utils/master/examples/plot_cfg/ais3_cfg.png
+[cfg]: https://i.imgur.com/QnxZzSF.png
 [examples]: https://github.com/axt/angr-utils/tree/master/examples

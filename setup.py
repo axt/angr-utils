@@ -13,7 +13,6 @@ setup(
         'networkx',
         'angr',
         'claripy',
-        'simuvex',
         'bingraphvis >= 0.2.0'
     ],
     description='Various utilities for angr binary analysis framework',

@@ -1,7 +1,6 @@
 # Some pretty-printing routines to help dealing with angr objects
-
+import angr
 import claripy
-import simuvex
 
 def _consolidate_expr(e0):
     if hasattr(e0, 'op') and e0.op == 'Reverse':
@@ -24,5 +23,5 @@ def consolidate_reverse_exprs(initial_state):
     
     NOTE: Experimental! Maybe not working correctly, use it with care!
     """
-    initial_state.inspect.b('mem_read', when=simuvex.BP_AFTER, action=_read_consolidate)
-    initial_state.inspect.b('reg_read', when=simuvex.BP_AFTER, action=_read_consolidate)
+    initial_state.inspect.b('mem_read', when=angr.BP_AFTER, action=_read_consolidate)
+    initial_state.inspect.b('reg_read', when=angr.BP_AFTER, action=_read_consolidate)

@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 import angr
-import simuvex
 
 from angrutils import plot_cfg
 from angrutils.exploration import NormalizedSteps
@@ -13,7 +12,7 @@ def analyze(b, addr, name=None):
 
     plot_cfg(cfg, "%s_cfg" % (name), asminst=True, vexinst=False, debug_info=False, remove_imports=False, remove_path_terminator=False)
 
-    start_state = b.factory.blank_state(addr=addr, add_options={simuvex.o.CONSERVATIVE_READ_STRATEGY} | simuvex.o.resilience_options)
+    start_state = b.factory.blank_state(addr=addr, add_options={angr.sim_options.CONSERVATIVE_READ_STRATEGY} | angr.sim_options.resilience_options)
     start_state.stack_push(0x0)
     
     simgr = b.factory.simgr(start_state)

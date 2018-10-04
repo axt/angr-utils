@@ -2,8 +2,7 @@
 
 import angr
 import claripy
-import simuvex
-from expr import *
+from .expr import *
 
 def pp(obj, **kwargs):
     if isinstance(obj, angr.sim_manager.SimulationManager):

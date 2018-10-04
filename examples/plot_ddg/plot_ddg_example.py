@@ -2,7 +2,7 @@
 
 import angr
 from angrutils import plot_cfg, plot_ddg_stmt, plot_ddg_data
-from simuvex import SimMemoryVariable, SimStackVariable, SimRegisterVariable
+from angr.sim_variable import SimMemoryVariable, SimStackVariable, SimRegisterVariable
 
 def analyze(b, addr, name=None):
     start_state = b.factory.blank_state(addr=addr)

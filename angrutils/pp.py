@@ -2,8 +2,7 @@
 
 import angr
 import claripy
-import simuvex
-from expr import *
+from .expr import *
 
 def pp(obj, **kwargs):
     if isinstance(obj, angr.sim_manager.SimulationManager):
@@ -38,7 +37,7 @@ def sim_state(state, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
     
 def sim_manager(simgr, delimiter=" -> ", cols=10, fmtwidth=8, level=0):
     ret = "\t" * level + "sim_manager\n"
-    for sname, stash in simgr.stashes.iteritems():
+    for sname, stash in simgr.stashes.items():
         if len(stash) > 0:
             ret += ("\t" * (level+1) + "%s %d\n") % (sname,len(stash))
             for state in stash:

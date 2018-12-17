@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='angr-utils',
-    version='0.4.0',
+    version='0.5.0',
     author='Attila Axt',
     author_email='axt@load.hu',
     license='BSD',
